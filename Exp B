@@ -1,0 +1,108 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+#define MAX 100  // Maximum size of the queue
+
+class CallCenter {
+private:
+    string calls[MAX];
+    int front, rear;
+
+public:
+    CallCenter() {  // Constructor to initialize the queue
+        front = -1;
+        rear = -1;
+    }
+
+    // Function to check if the queue is empty
+    bool isEmpty() {
+        return (front == -1);
+    }
+
+    // Function to check if the queue is full
+    bool isFull() {
+        return (rear + 1) % MAX == front;
+    }
+
+    // Function to add a call to the queue (enqueue)
+    void addCall(string caller) {
+        if (isFull()) {
+            cout << "Call queue is full. Cannot add call from " << caller << endl;
+            return;
+        }
+        if (isEmpty()) {
+            front = 0;  // First call
+        }
+        rear = (rear + 1) % MAX;  // Circular increment
+        calls[rear] = caller;  // Store the caller's name
+        cout << caller << " has called and is waiting in the queue.\n";
+    }
+
+    // Function to answer a call (dequeue)
+    string answerCall() {
+        if (isEmpty()) {
+            cout << "No calls to answer.\n";
+            return "";
+        }
+        string answeredCall = calls[front];
+        if (front == rear) {  // If the queue is now empty after answering
+            front = rear = -1;
+        } else {
+            front = (front + 1) % MAX;  // Circular increment
+        }
+        return answeredCall;
+    }
+
+    // Function to display the current call queue
+    void displayCalls() {
+        if (isEmpty()) {
+            cout << "No calls in the queue.\n";
+            return;
+        }
+        cout << "Current Call Queue: ";
+        int i = front;
+        while (true) {
+            cout << calls[i] << " ";
+            if (i == rear) break;  // Stop when we reach the rear
+            i = (i + 1) % MAX;  // Circular increment
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    CallCenter callCenter;
+    int choice;
+    string callerName;
+
+    while (true) {
+        cout << "\n1. Add Call\n2. Answer Call\n3. Display Call Queue\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter caller's name: ";
+                cin >> callerName;
+                callCenter.addCall(callerName);
+                break;
+            case 2:
+                callerName = callCenter.answerCall();
+                if (!callerName.empty()) {
+                    cout << callerName << "'s call has been answered.\n";
+                }
+                break;
+            case 3:
+                callCenter.displayCalls();
+                break;
+            case 4:
+                cout << "Exiting...\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    }
+
+    return 0;
+}
