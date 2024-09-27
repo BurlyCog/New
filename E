@@ -1,273 +1,85 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <string>
+using namespace std;
 
-struct Queue {
-    int front, rear, capacity;
-    int* queue;
+#define MAX 1000
+
+class Stack {
+    int top;
+    char arr[MAX];  // Array to simulate stack
+
+public:
+    Stack() { top = -1; }  // Constructor initializing stack top as -1
+
+    // Function to push an element into the stack
+    bool push(char c) {
+        if (top >= (MAX - 1)) {
+            cout << "Stack Overflow\n";
+            return false;
+        } else {
+            arr[++top] = c;
+            return true;
+        }
+    }
+
+    // Function to pop an element from the stack
+    char pop() {
+        if (top < 0) {
+            cout << "Stack Underflow\n";
+            return 0;
+        } else {
+            char c = arr[top--];
+            return c;
+        }
+    }
+
+    // Function to check if stack is empty
+    bool isEmpty() {
+        return (top < 0);
+    }
 };
 
-// Function to initialize the queue
-struct Queue* createQueue(int capacity) {
-    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
-    q->capacity = capacity;
-    q->front = 0;
-    q->rear = -1;
-    q->queue = (int*)malloc(q->capacity * sizeof(int));
-    return q;
+// Function to check if the input parentheses are balanced
+bool areParenthesesBalanced(string expr) {
+    Stack stack;
+
+    for (int i = 0; i < expr.length(); i++) {
+        char c = expr[i];
+
+        // If opening bracket, push to stack
+        if (c == '(' || c == '{' || c == '[') {
+            stack.push(c);
+        }
+
+        // If closing bracket, pop from stack and check
+        if (c == ')' || c == '}' || c == ']') {
+            if (stack.isEmpty()) {
+                return false;  // Stack is empty, so unbalanced
+            }
+            char poppedChar = stack.pop();
+            // Check for matching pair
+            if ((c == ')' && poppedChar != '(') ||
+                (c == '}' && poppedChar != '{') ||
+                (c == ']' && poppedChar != '[')) {
+                return false;
+            }
+        }
+    }
+
+    // If stack is not empty, then parentheses are unbalanced
+    return stack.isEmpty();
 }
 
-// Function to insert an element at the rear of the queue
-void enqueue(struct Queue* q, int data) {
-    // Check if the queue is full
-    if (q->rear == q->capacity - 1) {
-        printf("Queue is full\n");
-        return;
-    }
-
-    // Insert element at the rear
-    q->queue[++q->rear] = data;
-}
-
-// Function to delete an element from the front of the queue
-void dequeue(struct Queue* q) {
-    // If the queue is empty
-    if (q->front > q->rear) {
-        printf("Queue is empty\n");
-        return;
-    }
-
-    // Shift all elements from index 1 till rear to the left by one
-    for (int i = 0; i < q->rear; i++) {
-        q->queue[i] = q->queue[i + 1];
-    }
-
-    // Decrement rear
-    q->rear--;
-}
-
-// Function to print queue elements
-void display(struct Queue* q) {
-    if (q->front > q->rear) {
-        printf("Queue is Empty\n");
-        return;
-    }
-
-    // Traverse front to rear and print elements
-    for (int i = q->front; i <= q->rear; i++) {
-        printf("%d <-- ", q->queue[i]);
-    }
-    printf("\n");
-}
-
-// Function to print the front of the queue
-void front(struct Queue* q) {
-    if (q->rear == -1) {
-        printf("Queue is Empty\n");
-        return;
-    }
-    printf("Front Element is: %d\n", q->queue[q->front]);
-}
-
-// Driver code
 int main() {
-    // Create a queue of capacity 4
-    struct Queue* q = createQueue(4);
+    string expr;
+    cout << "Enter an expression with parentheses: ";
+    cin >> expr;
 
-    // Print queue elements
-    display(q);
-
-    // Insert elements in the queue
-    enqueue(q, 20);
-    enqueue(q, 30);
-    enqueue(q, 40);
-    enqueue(q, 50);
-
-    // Print queue elements
-    display(q);
-
-    // Insert element in the queue
-    enqueue(q, 60);
-
-    // Print queue elements
-    display(q);
-
-    // Dequeue elements
-    dequeue(q);
-    dequeue(q);
-
-    printf("After two node deletions\n");
-
-    // Print queue elements
-    display(q);
-
-    printf("After one insertion\n");
-    enqueue(q, 60);
-
-    // Print queue elements
-    display(q);
-
-    // Print front of the queue
-    front(q);
-
-    // Free the allocated memory
-    free(q->queue);
-    free(q);
+    if (areParenthesesBalanced(expr)) {
+        cout << "Balanced Parentheses\n";
+    } else {
+        cout << "Unbalanced Parentheses\n";
+    }
 
     return 0;
 }
-
- }
-
-
-
-//using linked list
-
-// C program to implement the queue data structure using
-// linked list
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-// Node structure representing a single node in the linked
-// list
-typedef struct Node {
-    int data;
-    struct Node* next;
-} Node;
-
-// Function to create a new node
-Node* createNode(int new_data)
-{
-    Node* new_node = (Node*)malloc(sizeof(Node));
-    new_node->data = new_data;
-    new_node->next = NULL;
-    return new_node;
-}
-
-// Structure to implement queue operations using a linked
-// list
-typedef struct Queue {
-
-    // Pointer to the front and the rear of the linked list
-    Node *front, *rear;
-} Queue;
-
-// Function to create a queue
-Queue* createQueue()
-{
-    Queue* q = (Queue*)malloc(sizeof(Queue));
-    q->front = q->rear = NULL;
-    return q;
-}
-
-// Function to check if the queue is empty
-int isEmpty(Queue* q)
-{
-
-    // If the front and rear are null, then the queue is
-    // empty, otherwise it's not
-    if (q->front == NULL && q->rear == NULL) {
-        return 1;
-    }
-    return 0;
-}
-
-// Function to add an element to the queue
-void enqueue(Queue* q, int new_data)
-{
-
-    // Create a new linked list node
-    Node* new_node = createNode(new_data);
-
-    // If queue is empty, the new node is both the front
-    // and rear
-    if (q->rear == NULL) {
-        q->front = q->rear = new_node;
-        return;
-    }
-
-    // Add the new node at the end of the queue and
-    // change rear
-    q->rear->next = new_node;
-    q->rear = new_node;
-}
-
-// Function to remove an element from the queue
-void dequeue(Queue* q)
-{
-
-    // If queue is empty, return
-    if (isEmpty(q)) {
-        printf("Queue Underflow\n");
-        return;
-    }
-
-    // Store previous front and move front one node
-    // ahead
-    Node* temp = q->front;
-    q->front = q->front->next;
-
-    // If front becomes null, then change rear also
-    // to null
-    if (q->front == NULL)
-        q->rear = NULL;
-
-    // Deallocate memory of the old front node
-    free(temp);
-}
-
-// Function to get the front element of the queue
-int getFront(Queue* q)
-{
-
-    // Checking if the queue is empty
-    if (isEmpty(q)) {
-        printf("Queue is empty\n");
-        return INT_MIN;
-    }
-    return q->front->data;
-}
-
-// Function to get the rear element of the queue
-int getRear(Queue* q)
-{
-
-    // Checking if the queue is empty
-    if (isEmpty(q)) {
-        printf("Queue is empty\n");
-        return INT_MIN;
-    }
-    return q->rear->data;
-}
-
-// Driver code
-int main()
-{
-    Queue* q = createQueue();
-
-    // Enqueue elements into the queue
-    enqueue(q, 10);
-    enqueue(q, 20);
-    
-      printf("Queue Front: %d\n", getFront(q));
-    printf("Queue Rear: %d\n", getRear(q));
-
-    // Dequeue elements from the queue
-    dequeue(q);
-    dequeue(q);
-
-
-    // Enqueue more elements into the queue
-    enqueue(q, 30);
-    enqueue(q, 40);
-    enqueue(q, 50);
-
-    // Dequeue an element from the queue
-    dequeue(q);
-
-    printf("Queue Front: %d\n", getFront(q));
-    printf("Queue Rear: %d\n", getRear(q));
-
-    return 0;
-}
-
